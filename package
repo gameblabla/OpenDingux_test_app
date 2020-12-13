@@ -1,0 +1,31 @@
+#!/bin/sh
+
+mkdir -p opk
+cp ./test.elf opk/test.elf
+cp ./icon.png opk/icon.png
+
+# https://unix.stackexchange.com/questions/219268/how-to-add-new-lines-when-using-echo
+print()
+	case    ${IFS- } in
+	(\ *)   printf  %b\\n "$*";;
+	(*)     IFS=\ $IFS
+	printf  %b\\n "$*"
+	IFS=${IFS#?}
+esac
+
+# Create GmenuNx entry file plus other things
+
+print '[Desktop Entry]
+Type=Application
+Name=Example OD APP
+Comment=Example OD APP
+Exec=test.elf
+Icon=icon
+Terminal=false
+Type=Application
+Categories=games;
+X-OD-NeedsDownscaling=true' > opk/default.gcw0.desktop
+
+mksquashfs ./opk test_app_gcw0.opk -all-root -noappend -no-exports -no-xattrs
+
+rm -r opk
